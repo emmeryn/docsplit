@@ -53,32 +53,28 @@ class ExtractTextTest < Minitest::Test
     Docsplit.extract_text('test/fixtures/PDF file with spaces \'single\' and "double quotes".pdf', :pages => 'all', :output => OUTPUT)
     assert Dir["#{OUTPUT}/*.txt"].length == 2
   end
-  
+
   def test_orientation_detected_ocr_extraction
-    if Docsplit::DEPENDENCIES[:osd]
-      pages = 1..4
-      Docsplit.extract_text('test/fixtures/corrosion.reoriented.pdf', :output => OUTPUT, :pages=>pages, :force_ocr => true)
-      letters = Hash.new(0)
-      nonletters = Hash.new(0)
-      
-      pages.each do |number|
-        File.open(File.join(OUTPUT,"corrosion.reoriented_#{number}.txt")).each_char do |c| 
-          case c
-          when /[A-Za-z]/
-            letters[c] += 1
-          when /\s/
-          else
-            nonletters[c] += 1
-          end
+    pages = 1..4
+    Docsplit.extract_text('test/fixtures/corrosion.reoriented.pdf', :output => OUTPUT, :pages=>pages, :ocr => true)
+    letters = Hash.new(0)
+    nonletters = Hash.new(0)
+
+    pages.each do |number|
+      File.open(File.join(OUTPUT,"corrosion.reoriented_#{number}.txt")).each_char do |c|
+        case c
+        when /[A-Za-z]/
+          letters[c] += 1
+        when /\s/
+        else
+          nonletters[c] += 1
         end
       end
-      
-      # the corrosion.pdf has 6160 letters & 362 nonletters, or ~17:1
-      # so lets give a fudge factor of ~half of that or 8:1
-      assert letters.values.reduce(0,:+)/8 > nonletters.values.reduce(0,:+), "Expected that text extracted with orientation detection would have more letters."
-    else
-      skip "Orientation detection module (osd) for Tesseract isn't installed"
     end
+
+    # the corrosion.pdf has 6160 letters & 362 nonletters, or ~17:1
+    # so lets give a fudge factor of ~half of that or 8:1
+    assert letters.values.reduce(0,:+)/8 > nonletters.values.reduce(0,:+), "Expected that text extracted with orientation detection would have more letters."
   end
 
 end

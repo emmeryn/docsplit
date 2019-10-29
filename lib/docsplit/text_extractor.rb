@@ -134,7 +134,7 @@ module Docsplit
       @forbid_ocr         = options[:ocr] == false
       @language           = options[:language] || 'eng'
       @clean_ocr          = (!(options[:clean] == false) and @language == 'eng')
-      @detect_orientation = ((options[:detect_orientation] != false) and DEPENDENCIES[:osd])
+      @detect_orientation = options[:detect_orientation] != false
       @keep_layout        = options.fetch(:layout, false)
     end
 
