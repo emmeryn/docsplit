@@ -60,7 +60,13 @@ module Docsplit
       tempdir = Dir.mktmpdir
       base_path = File.join(@output, @pdf_name)
       escaped_pdf = ESCAPE[pdf]
-      psm = @detect_orientation ? "-psm 1" : ""
+      psm = if @psm
+              "--psm #{@psm}"
+            elsif @detect_orientation
+              '--psm 1'
+            else
+              ''
+            end
       if pages
         pages.each do |page|
           tiff = "#{tempdir}/#{@pdf_name}_#{page}.tif"
@@ -135,6 +141,7 @@ module Docsplit
       @language           = options[:language] || 'eng'
       @clean_ocr          = (!(options[:clean] == false) and @language == 'eng')
       @detect_orientation = options[:detect_orientation] != false
+      @psm                = options[:psm]
       @keep_layout        = options.fetch(:layout, false)
     end
 
